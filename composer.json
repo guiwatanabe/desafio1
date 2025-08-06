@@ -70,7 +70,7 @@
             "@php artisan test"
         ],
         "phpstan": [
-            "vendor/bin/phpstan analyse app"
+            "vendor/bin/phpstan analyse app --memory-limit=1G"
         ],
         "setup": [
             "composer install",

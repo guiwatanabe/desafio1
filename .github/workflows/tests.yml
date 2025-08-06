@@ -1,4 +1,4 @@
-name: tests
+name: unit-tests
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
       - main
 
 jobs:
-  ci:
+  laravel-tests:
     runs-on: ubuntu-latest
 
     steps:
@@ -24,6 +24,7 @@ jobs:
           php-version: 8.4
           tools: composer:v2
           coverage: xdebug
+          extensions: sqlite, pdo_sqlite
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -35,16 +36,28 @@ jobs:
         run: npm ci
 
       - name: Install Dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+        run: |
+          composer clear-cache
+          composer install --no-ansi --no-interaction --no-scripts --prefer-dist
 
-      - name: Copy Environment File
-        run: cp .env.testing .env
+      - name: Create Database
+        run: |
+          mkdir -p database
+          touch database/database.sqlite
 
-      - name: Generate Application Key
-        run: php artisan key:generate
+      - name: Prepare Laravel Application
+        run: |
+          cp .env.testing .env
+          php artisan key:generate
 
       - name: Setup Database
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
         run: php artisan migrate
+
+      - name: Directory Permissions
+        run: chmod -R 777 storage bootstrap/cache
 
       - name: Publish Ziggy Configuration
         run: php artisan ziggy:generate
@@ -52,5 +65,12 @@ jobs:
       - name: Build Assets
         run: npm run build
 
-      - name: Tests
-        run: ./vendor/bin/pest
+      - name: Execute tests (Unit and Feature tests) via PHPUnit
+        env:
+          APP_ENV: testing
+          APP_URL: http://localhost
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+          SESSION_DRIVER: database
+          QUEUE_CONNECTION: sync
+        run: composer test
