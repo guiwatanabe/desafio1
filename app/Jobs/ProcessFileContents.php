@@ -38,7 +38,7 @@ class ProcessFileContents implements ShouldQueue, ShouldBeUnique
             if (!str_contains($file->filename, '.xml')) continue;
 
             $this->parseFile($file);
-            $file->processed = 1;
+            $file->processed = true;
             $file->save();
         }
     }
@@ -69,7 +69,7 @@ class ProcessFileContents implements ShouldQueue, ShouldBeUnique
      * Cria o registro no banco de dados
      *
      * @param integer $fileId
-     * @param array $article
+     * @param \SimpleXMLElement $article
      * @return bool
      */
     private function createMetadataEntry(int $fileId, \SimpleXMLElement $article): bool
