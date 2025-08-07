@@ -9,6 +9,6 @@ defineProps<{
 
 <template>
     <AuthLayout :title="title" :description="description">
-        <slot />sd
+        <slot />
     </AuthLayout>
 </template>
