@@ -16,10 +16,10 @@ class AmqpPublicationPublisher
         $resource = new PublicationMetadataResource($this->publication);
         $data = $resource->toJson();
 
-        $host = config('RABBITMQ_HOST', 'rabbitmq');
-        $port = config('RABBITMQ_PORT', 5672);
-        $user = config('RABBITMQ_USER');
-        $password = config('RABBITMQ_PASSWORD');
+        $host = config('services.rabbitmq.host');
+        $port = config('services.rabbitmq.port');
+        $user = config('services.rabbitmq.user');
+        $password = config('services.rabbitmq.password');
 
         $connection = new AMQPStreamConnection($host, $port, $user, $password);
         $channel = $connection->channel();
