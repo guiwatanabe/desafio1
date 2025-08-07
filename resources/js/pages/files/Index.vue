@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
 import { File, type BreadcrumbItem } from '@/types';
-import { Head, usePage } from '@inertiajs/vue3';
-import Button from '@/components/ui/button/Button.vue';
+import { Head } from '@inertiajs/vue3';
+
 import {
     Table,
     TableBody,
@@ -48,7 +48,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        <TableRow v-for="file in files.data">
+                        <TableRow v-for="file in files.data" :key="file.id">
                             <TableCell>{{ file.filename }}</TableCell>
                             <TableCell>{{ file.size }}</TableCell>
                             <TableCell>{{ file.processed }}</TableCell>

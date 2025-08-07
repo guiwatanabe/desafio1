@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\App;
 
 /**
  * 
@@ -122,6 +123,7 @@ class ProcessFileContents implements ShouldQueue, ShouldBeUnique
      */
     private function publishMetadataEntry(PublicationMetadata $publicationMetadata)
     {
+        if (App::environment('testing')) return;
         $this->amqpService = new AmqpPublicationPublisher($publicationMetadata);
         $this->amqpService->publishTopic();
     }

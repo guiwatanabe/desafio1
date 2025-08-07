@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Publication, type BreadcrumbItem } from '@/types';
-import { Head, usePage } from '@inertiajs/vue3';
-import Button from '@/components/ui/button/Button.vue';
+import { Head } from '@inertiajs/vue3';
+
 import {
     Table,
     TableBody,
@@ -49,7 +49,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        <TableRow v-for="publication in publications.data">
+                        <TableRow v-for="publication in publications.data" :key="publication.id">
                             <TableCell>{{ publication.id }}</TableCell>
                             <TableCell>{{ publication.pub_date }}</TableCell>
                             <TableCell>{{ publication.name }}</TableCell>
