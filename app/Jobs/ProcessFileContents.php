@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\File;
 use App\Models\PublicationMetadata;
 use App\Models\UploadedFile;
+use App\Services\AmqpPublicationPublisher;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -25,6 +26,8 @@ class ProcessFileContents implements ShouldQueue, ShouldBeUnique
     public $timeout = 300;
 
     protected $fileId;
+
+    protected $amqpService;
 
     public function __construct(public UploadedFile $uploadedFile)
     {
@@ -62,7 +65,14 @@ class ProcessFileContents implements ShouldQueue, ShouldBeUnique
 
         $article = $xml->article;
 
-        return $this->createMetadataEntry($file->id, $article);
+        $created = $this->createMetadataEntry($file->id, $article);
+        if ($created) {
+            $articleId = (int)$article['id'];
+            $publication = PublicationMetadata::find($articleId);
+            $this->publishMetadataEntry($publication);
+        }
+
+        return $created;
     }
 
     /**
@@ -102,5 +112,17 @@ class ProcessFileContents implements ShouldQueue, ShouldBeUnique
         ]);
 
         return $metadata->save();
+    }
+
+    /**
+     * Publicar mensagem via AMQP
+     *
+     * @param PublicationMetadata $publicationMetadata
+     * @return void
+     */
+    private function publishMetadataEntry(PublicationMetadata $publicationMetadata)
+    {
+        $this->amqpService = new AmqpPublicationPublisher($publicationMetadata);
+        $this->amqpService->publishTopic();
     }
 }

@@ -26,9 +26,19 @@ class UploadedFileController extends Controller
         }
 
         $file = $request->file('file');
-        $safeFileName = $file->hashName();
-        $storeFile = $file->storeAs('uploaded_files', $safeFileName);
+        $fileName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        $safeFileName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $fileName);
+        $safeFileName = $safeFileName . '.zip';
 
+        $findDuplicate = UploadedFile::firstWhere('filename', $safeFileName);
+        if ($findDuplicate) {
+            return response()->json(
+                ['message' => 'Este arquivo já foi enviado anteriormente.'],
+                Response::HTTP_OK
+            );
+        }
+
+        $storeFile = $file->storeAs('uploaded_files', $safeFileName);
         if (!$storeFile) {
             return response()->json(
                 ['error' => 'Falha ao salvar arquivo. Tente novamente mais tarde.'],
