@@ -3,10 +3,13 @@
 Aplicação para processar arquivos comprimidos (.zip), extrair os arquivos XML e processar os registros, salvando no banco de dados e publicando em um tópico AMQP.
 
 ### Ambiente Local
-`composer run dev`
+- Configurar as variáveis de ambiente
+- `composer run dev`
+
 
 ### Build - Docker
-`docker compose up --build`.
+- Criar o arquivo com variáveis de ambiente `.env.production`
+- `docker compose up --build`.
 
 ---
 
